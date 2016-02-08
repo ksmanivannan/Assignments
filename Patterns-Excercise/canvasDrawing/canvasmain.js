@@ -8,16 +8,20 @@ function Shape(x, y, w, h, fill) {
 }
 
 // Draws shape to a given context
-Shape.prototype.draw = function(ctx) {
+Shape.prototype.drawSquare = function(ctx) {
+    //To draw Square
     ctx.fillStyle = this.fill;
     ctx.fillRect(this.x, this.y, this.w, this.h);
 
-   /*
-   //To draw arc ie Circle
-   ctx.beginPath();
-    ctx.arc(this.x, this.y, this.w,0,2*Math.PI);
-    ctx.stroke(); */
 }
+
+Shape.prototype.drawCircle = function(ctx) {
+    //To draw arc/Circle
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.w,0,Math.PI*2,true);
+    ctx.stroke();
+}
+
 
 // Determine if a point is inside the shape's bounds
 Shape.prototype.exists = function(mx, my) {
@@ -68,13 +72,26 @@ function CanvasState(canvas) {
         for (var i = l-1; i >= 0; i--) {
             if (shapes[i].exists(mx, my)) {
                 var mySel = shapes[i];
-                // Keep track the coordinates we clicked in the obj
-                canvasState.dragoffx = mx - mySel.x;
-                canvasState.dragoffy = my - mySel.y;
-                canvasState.dragging = true;
-                canvasState.selection = mySel;
-                canvasState.valid = false;
-                return;
+
+                if (mySel instanceof Shape.prototype.drawSquare ) {
+                    // Keep track the coordinates we clicked in the obj
+                    canvasState.dragoffx = mx - mySel.x;
+                    canvasState.dragoffy = my - mySel.y;
+                    canvasState.dragging = true;
+                    canvasState.selection = mySel;
+                    canvasState.valid = false;
+                    return;
+                }
+                else {
+                    // Keep track the coordinates we clicked in the obj
+                    canvasState.dragoffx = mx - mySel.x;
+                    canvasState.dragoffy = my - mySel.y;
+                    canvasState.dragging = true;
+                    canvasState.selection = mySel;
+                    canvasState.valid = false;
+                    return;
+
+                }
             }
         }
         // If there was an object selected, we deselect it
@@ -102,23 +119,13 @@ function CanvasState(canvas) {
     canvas.addEventListener('dblclick', function(e) {
 
         var shapeSelected=document.getElementById("shapeInput").value;
-        if(shapeSelected=='square')
-        {
             var mouse = canvasState.getMouse(e);
             canvasState.addShape(new Shape(mouse.x - 10, mouse.y - 10, 50, 50, 'blue'));
             this.selectionColor = 'red';
             this.selectionWidth = 2;
             this.interval = 30;
-            setInterval(function() { canvasState.draw(); }, canvasState.interval);
-        }else if(shapeSelected=='circle')
-        {
-            var mouse = canvasState.getMouse(e);
-            canvasState.addShape(new Shape(mouse.x - 10, mouse.y - 10, 50, 50, 'blue'));
-            this.selectionColor = 'red';
-            this.selectionWidth = 2;
-            this.interval = 30;
-            setInterval(function() { canvasState.draw(); }, canvasState.interval);
-        }
+            setInterval(function() { canvasState.draw(shapeSelected); }, canvasState.interval);
+
 
         }, true);
 
@@ -135,7 +142,7 @@ CanvasState.prototype.clear = function() {
     this.ctx.clearRect(0, 0, this.width, this.height);
 }
 
-CanvasState.prototype.draw = function() {
+CanvasState.prototype.draw = function(shapeSelected) {
     // if state is invalid, redraw and validate
     if (!this.valid) {
         var ctx = this.ctx;
@@ -146,23 +153,40 @@ CanvasState.prototype.draw = function() {
         var l = shapes.length;
         for (var i = 0; i < l; i++) {
             var shape = shapes[i];
-            // To skip the element went out of canvas area
-            if (shape.x > this.width || shape.y > this.height ||
-                shape.x + shape.w < 0 || shape.y + shape.h < 0) continue;
-            shapes[i].draw(ctx);
+            if(shapeSelected=='square') {
+                // To skip the element went out of canvas area
+                if (shape.x > this.width || shape.y > this.height ||
+                    shape.x + shape.w < 0 || shape.y + shape.h < 0) continue;
+                shapes[i].drawSquare(ctx);
+            }
+            else
+            {
+                shapes[i].drawCircle(ctx);
+
+            }
         }
 
-        if (this.selection != null) {
+        if (this.selection != null && this instanceof Shape.prototype.drawSquare ) {
             ctx.strokeStyle = this.selectionColor;
             ctx.lineWidth = this.selectionWidth;
             var mySel = this.selection;
             ctx.strokeRect(mySel.x,mySel.y,mySel.w,mySel.h);
         }
+        else if (this.selection != null && this instanceof Shape.prototype.drawCircle){
+            ctx.strokeStyle = this.selectionColor;
+            ctx.lineWidth = this.selectionWidth;
+            var mySel = this.selection;
+            ctx.beginPath();
+            ctx.arc(mySel.x,mySel.y,mySel.w,0,Math.PI*2,true);
+            ctx.stroke();
+
+        }
+        }
 
 
         this.valid = true;
     }
-}
+
 
 
 // set to the mouse position relative to the state's canvas

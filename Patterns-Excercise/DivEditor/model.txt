@@ -1,0 +1,38 @@
+    var UserActions = {
+
+    captureUserActions: [],
+        listeners: {},
+        storeHistory: function() {
+
+            var input = event.target.value;
+
+                this.captureUserActions = input;
+                this.dispatch("undo-action");
+
+            
+        },
+        on: function(eventName, listener) {
+            if(!this.listeners[eventName])
+                this.listeners[eventName] = [];
+                this.listeners[eventName].push(listener);
+        },
+        dispatch: function(eventName) {
+            if(this.listeners[eventName]) {
+                for(var i=0; i<this.listeners[eventName].length; i++) {
+                    this.listeners[eventName][i](this);
+                }
+            }
+        },
+        performedActions: function() {
+            return this.captureUserActions;
+        }
+    }
+	
+	
+	 UserActions.on("reverse-action", function() {
+        var res = UserActions.numOfsearchedUserActions();
+        for (var i = 0; i < res.length; i++) {
+            exec(res[i]);
+        }
+
+    });

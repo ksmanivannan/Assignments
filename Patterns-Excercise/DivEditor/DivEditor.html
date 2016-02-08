@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<script type="text/javascript" src="colorpalette.js"></script>
+    <script type="text/javascript" src="statehandler.js"></script>
+<style>
+
+
+#b1,#b2 {float:left; }
+
+.color {
+    border: solid thin black;
+    width: 50px;
+    height: 50px;
+ position: relative;
+ word-wrap: break-word;
+ float:left;
+}
+
+
+ #boxA, #boxB , #boxC {
+            float:left;padding:10px;margin:10px;-moz-user-select:none;border: solid black;border-width:6px; 
+         }
+         
+         #boxA { background-color: red; width:50px; height:50px;  }
+		 #boxB { background-color: yellow; width:50px; height:50px;  }
+		 #boxC { background-color: green; width:50px; height:50px;  }
+         
+
+.drag {
+
+    float: left;
+    position: relative;
+    width: 100px;
+    height: 100px;
+    background: grey;
+	border-style: solid;
+    margin: 5px;
+word-wrap: break-word;
+}
+.slider { margin: 0 10px; }
+.expand-me { margin: 50px auto; width: 25px; height: 25px; background: #000; }
+
+select {
+   background: transparent;
+   width: 100px;
+   padding: 5px;
+   font-size: 18px;
+   line-height: 1;
+   border: 0;
+   border-radius: 0;
+   height: 48px;
+   -webkit-appearance: none;
+   }
+label {position:relative;}
+
+.btn {
+    display: inline-block;
+    padding: 3px 6px;
+    text-decoration: none;
+    color: #333;
+    background: #ddd;
+}
+.btn,
+.buttonUI {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+}
+.btn:hover {
+    background: #ccc;
+}
+
+
+</style>	
+
+
+</head>
+
+<body>
+<b>Changing Div Colors:</b><br>
+<input id="color1" class="color" onchange="applyStyle('changeColor','#'+this.color)">
+<input id="color2" class="color" onchange="applyStyle('changeBorderColor','#'+this.color)">
+<br><br><br>
+
+<label for="bwidth"><b>Border-Width :</b></label>
+<input type="range" min="1" max="30" value="0" id="bwidth" step="1">
+<label for="bradius"><b>Border-Radius :</b></label>
+<input type="range" min="0" max="50" value="0" id="bradius" step=".1">
+<b>Border-Style  :</b><label><select id="bstyle" onchange="applyBorderStyle(this);" size="10">
+  <option>none</option>
+  <option>hidden</option>
+  <option>dotted</option>
+  <option>dashed</option>
+  <option>solid</option>
+  <option>double</option>
+  <option>groove</option>
+  <option>ridge</option>
+  <option>inset</option>
+  <option>outset</option>
+</select></label><br>
+
+<b id="b1">Source Container:</b>
+<div id="source" style="background-color:#FFEBCD; color:black; padding:120px;"
+ondragenter="return dragEnter(event)" 
+ondrop="return dragDrop(event)"
+ondragover="return dragOver(event)" >
+<!-- <div class="expand-me"></div> -->
+<div id="boxA" draggable="true" 
+ondragstart="return dragStart(event,this)">
+</div>
+
+<div id="boxB" draggable="true" 
+ondragstart="return dragStart(event,this)">
+</div>
+
+<div id="boxC" draggable="true" 
+ondragstart="return dragStart(event,this)">
+</div>
+
+</div>
+<div class="buttonUI">
+    <a id="undo" class="btn" href="#"><b>Undo</b></a> <a id="redo" class="btn" href="#"><b>Redo</b></a>
+</div>
+<b id="b2">Destination Container:</b>
+<div id="destiny" style="background-color:#F0FFFF; color:black; padding:120px;" ondragenter="return dragEnter(event)"ondrop="return dragDrop(event)"ondragover="return dragOver(event)"></div>
+<script>
+
+    function dragStart(ev,obj) {
+        ev.dataTransfer.effectAllowed='move';
+        ev.dataTransfer.setData("Text", ev.target.getAttribute('id'));
+        ev.dataTransfer.setDragImage(ev.target,0,0);
+        ev.dataTransfer.setData("srcLocation",obj.parentElement.id);
+        return true;
+    }
+
+    function dragEnter(ev) {
+        ev.preventDefault();
+        return true;
+    }
+
+    function dragOver(ev) {
+        return false;
+    }
+
+    function dragDrop(ev) {
+        ev.preventDefault();
+        var src = ev.dataTransfer.getData("Text");
+        var srcLocation = ev.dataTransfer.getData("srcLocation");
+        if((ev.target.id=="boxA"||ev.target.id=="boxB"||ev.target.id=="boxC")||(ev.target.id=="destiny"&&ev.target.childElementCount>=1))
+        {return;
+        }
+        ev.target.appendChild(document.getElementById(src));
+        ev.stopPropagation();
+
+        var obj=document.getElementById(src);
+        //var srcLocation = ev.source.id
+        var destinyLocation = ev.target.id;
+        stateHdlr.add({
+            undo: function() {
+                moveObj(obj, srcLocation);
+            },
+            redo: function() {
+                moveObj(obj, destinyLocation);
+            }
+        });
+
+
+        if(ev.target.id=="destiny")
+        {
+            document.getElementById("bstyle").disabled = false;
+            document.getElementById("color1").disabled = false;
+            document.getElementById("color2").disabled = false;
+            document.getElementById("bwidth").disabled = false;
+            document.getElementById("bradius").disabled = false;
+            document.getElementById("bwidth").value=getNumberfromString(getCssProperty(src,"border-width"));
+            document.getElementById("bradius").value=getNumberfromString(getCssProperty(src,"border-radius"));
+            document.getElementById("bstyle").value=getCssProperty(src,"border-style");
+            document.getElementById("color1").style.color=getCssProperty(src,"background-color");
+            document.getElementById("color2").style.color=getCssProperty(src,"border-color");
+            document.getElementById("color1").style.backgroundColor=getCssProperty(src,"background-color");
+            document.getElementById("color2").style.backgroundColor=getCssProperty(src,"border-color");
+
+        }
+        else{
+            document.getElementById("bstyle").disabled = true;
+            document.getElementById("color1").disabled = true;
+            document.getElementById("color2").disabled = true;
+            document.getElementById("bwidth").disabled = true;
+            document.getElementById("bradius").disabled = true;
+        }
+        return false;
+    }
+
+
+
+
+    function moveObj(obj,loc) {
+
+        var location=document.getElementById(loc);
+        location.appendChild(obj);
+      if(location.id=="destiny")
+        {
+            document.getElementById("bstyle").disabled = false;
+            document.getElementById("color1").disabled = false;
+            document.getElementById("color2").disabled = false;
+            document.getElementById("bwidth").disabled = false;
+            document.getElementById("bradius").disabled = false;
+            document.getElementById("bwidth").value=getNumberfromString(getCssProperty(obj.id,"border-width"));
+            document.getElementById("bradius").value=getNumberfromString(getCssProperty(obj.id,"border-radius"));
+            document.getElementById("bstyle").value=getCssProperty(obj.id,"border-style");
+            document.getElementById("color1").style.color=getCssProperty(obj.id,"background-color");
+            document.getElementById("color2").style.color=getCssProperty(obj.id,"border-color");
+            document.getElementById("color1").style.backgroundColor=getCssProperty(obj.id,"background-color");
+            document.getElementById("color2").style.backgroundColor=getCssProperty(obj.id,"border-color");
+
+        }
+        else{
+            document.getElementById("bstyle").disabled = true;
+            document.getElementById("color1").disabled = true;
+            document.getElementById("color2").disabled = true;
+            document.getElementById("bwidth").disabled = true;
+            document.getElementById("bradius").disabled = true;
+        }
+        return false;
+    }
+
+
+
+
+    function applyStyle(operationName,color) {
+
+
+        var c = document.getElementById("destiny").childNodes;
+
+        if(c.length==1&&(c[0].id=='boxA'||c[0].id=='boxB'||c[0].id=='boxC'))
+        {
+            var obj = document.getElementById(c[0].id);
+            if (!obj) {
+                return;
+            }
+            if(operationName=='changeColor')
+            {
+                var originalColour = obj.style.backgroundColor;
+                var targetColour = color;
+                obj.style.backgroundColor = color;
+                stateHdlr.add({
+                    undo: function() {
+                        changeColor(obj, originalColour);
+                    },
+                    redo: function() {
+                        changeColor(obj, targetColour);
+                    }
+                });
+
+
+            }
+            else if(operationName=='changeBorderColor')
+            {
+                var originalColour = obj.style.borderColor;
+                var targetColour = color;
+                obj.style.borderColor = color;
+                stateHdlr.add({
+                    undo: function() {
+                        changeBorderColor(obj, originalColour);
+                    },
+                    redo: function() {
+                        changeBorderColor(obj, targetColour);
+                    }
+                });
+            }
+        }
+
+        else{
+            alert('Pls keep any one of the box in the designated area to Edit');
+        }
+    }
+
+
+    function changeColor(obj, color) {
+        obj.style.backgroundColor = color;
+
+    }
+
+    function changeBorderColor(obj, color) {
+        obj.style.borderColor = color;
+
+    }
+
+
+
+bwidth.onchange=function() {
+    var c = document.getElementById("destiny").childNodes;
+    	
+		if(c.length==1&&(c[0].id=='boxA'||c[0].id=='boxB'||c[0].id=='boxC'))
+			{
+
+    var bwidth = document.getElementById('bwidth');
+                var obj = document.getElementById(c[0].id);
+                if (!obj) {
+                    return;
+                }
+
+                var originalborderWidth = obj.style.borderWidth;
+                var targetborderWidth = bwidth.value+"px";
+               stateHdlr.add({
+                    undo: function() {
+                        changeBorderWidth(obj, originalborderWidth);
+                    },
+                    redo: function() {
+                        changeBorderWidth(obj, targetborderWidth);
+                    }
+                });
+
+                document.getElementById(c[0].id).style.borderWidth = bwidth.value+"px";
+		}
+		 		 
+		 else{
+		 alert('Pls keep any one of the box in the designated area to Edit');
+		 }
+
+	}
+
+    function changeBorderWidth(obj, borderWidth) {
+        obj.style.borderWidth = borderWidth;
+
+    }
+
+
+    bradius.onchange=function() {
+    var c = document.getElementById("destiny").childNodes;
+    	
+		if(c.length==1&&(c[0].id=='boxA'||c[0].id=='boxB'||c[0].id=='boxC'))
+			{
+
+    var bradius = document.getElementById('bradius');
+     var obj = document.getElementById(c[0].id);
+                if (!obj) {
+                    return;
+                }
+                var originalborderRadius = obj.style.borderRadius;
+                var targetborderRadius = bradius.value+"em";
+                stateHdlr.add({
+                    undo: function() {
+                        changeBorderRadius(obj, originalborderRadius);
+                    },
+                    redo: function() {
+                        changeBorderRadius(obj, targetborderRadius);
+                    }
+                });
+
+
+                document.getElementById(c[0].id).style.borderRadius = bradius.value+"em";
+		}
+		 		 
+		 else{
+		 alert('Pls keep any one of the box in the designated area to Edit');
+		 }
+
+	}
+
+
+    function changeBorderRadius(obj, borderRadius) {
+        obj.style.borderRadius = borderRadius;
+
+    }
+
+
+    function applyBorderStyle(selectTag) {
+    var c = document.getElementById("destiny").childNodes;
+    	
+		if(c.length==1&&(c[0].id=='boxA'||c[0].id=='boxB'||c[0].id=='boxC'))
+			{
+                var listValue = selectTag.options[selectTag.selectedIndex].text;
+
+                var obj = document.getElementById(c[0].id);
+                if (!obj) {
+                    return;
+                }
+                var originalBorderStyle = obj.style.borderStyle;
+                var targetBorderStyle = listValue;
+                stateHdlr.add({
+                    undo: function() {
+                        changeBorderStyle(obj, originalBorderStyle);
+                    },
+                    redo: function() {
+                        changeBorderStyle(obj, targetBorderStyle);
+                    }
+                });
+
+                document.getElementById(c[0].id).style.borderStyle = listValue;
+			}
+	
+	 else{
+		 alert('Pls keep any one of the box in the designated area to Edit');
+		 }
+
+	}
+
+
+
+    function changeBorderStyle(obj, borderStyle) {
+        obj.style.borderStyle = borderStyle;
+
+    }
+
+document.addEventListener('DOMContentLoaded', function() 
+{
+ document.getElementById("bstyle").disabled = true;
+ document.getElementById("color1").disabled = true;
+ document.getElementById("color2").disabled = true;
+ document.getElementById("bwidth").disabled = true;
+ document.getElementById("bradius").disabled = true;
+ }, false);
+
+function getCssProperty(elmId, property){
+   var elem = document.getElementById(elmId);
+   return window.getComputedStyle(elem,null).getPropertyValue(property);
+}
+
+function getNumberfromString(inp){
+   var regex = /(\d+)/g;
+   return inp.match(regex);
+}
+
+
+
+
+var stateHdlr = new StateHandler();
+var undoBtn = document.getElementById('undo');
+var redoBtn = document.getElementById('redo');
+
+undoBtn.addEventListener('click', function(ev) {
+    var c = document.getElementById("destiny").childNodes;
+        stateHdlr.undo();
+
+});
+
+redoBtn.addEventListener('click', function(ev) {
+    var c = document.getElementById("destiny").childNodes;
+        stateHdlr.redo();
+
+});
+
+
+</script>
+
+</body>
+
+
+
+</html>
