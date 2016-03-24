@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html ng-app="myChartApp">
+<head>
+<meta charset="utf-8" />
+<title> Chart Drawing </title>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular.min.js"></script>
+<script type="text/javascript" src="https://code.highcharts.com/highcharts.js"></script>
+<script src="http://code.highcharts.com/adapters/standalone-framework.js"></script>
+<script src="highcharts-ng-master/highcharts-ng-master/src/highcharts-ng.js"></script>
+    <link href="bootstrap.css" rel="stylesheet" />
+    <link href="bootstrap-theme.css" rel="stylesheet" />
+    <script src="https://ajax.googleapis.com/ajax/libs /jquery/1.7.2/jquery.min.js"></script>
+</head>
+<body ng-controller="myController">
+
+<hc-bar-chart options="chartBarOptions" >Placeholder for Bar chart</hc-bar-chart>
+<hc-pie-chart title="Productivity Ratio" data="pieData">Placeholder for pie chart</hc-pie-chart>
+<hc-chart options="chartOptions">Placeholder for generic chart</hc-chart>
+
+
+<script>
+angular.module('myChartApp',["highcharts-ng"] )
+    .directive('hcBarChart', function () {
+        return {
+            template: '<div></div>',
+            scope: {
+                options: '='
+            },
+            link: function (scope, element) {
+                Highcharts.chart(element[0], scope.options);
+
+            }
+
+        };
+    })
+    // Directive for generic chart, pass in chart options
+        .directive('hcChart', function () {
+            return {
+                restrict: 'E',
+                template: '<div></div>',
+                scope: {
+                    options: '='
+                },
+                link: function (scope, element) {
+                Highcharts.chart(element[0], scope.options);
+                }
+            };
+        })
+    // Directive for pie charts, pass in title and data only
+    .directive('hcPieChart', function () {
+        return {
+            restrict: 'E',
+            template: '<div></div>',
+            scope: {
+                title: '@',
+                data: '='
+            },
+            link: function (scope, element) {
+                Highcharts.chart(element[0], {
+                    chart: {
+                        type: 'pie'
+                    },
+                    title: {
+                        text: scope.title
+                    },
+                    plotOptions: {
+                        pie: {
+                            allowPointSelect: true,
+                            cursor: 'pointer',
+                            dataLabels: {
+                                enabled: true,
+                                format: '<b>{point.name}</b>: {point.percentage:.1f} %'
+                            }
+                        }
+                    },
+                    series: [{
+                        data: scope.data
+                    }]
+                });
+            }
+        };
+    })
+    .controller('myController', function ($scope) {
+// Sample options for Bar chart
+            $scope.chartBarOptions = {
+                title: {
+                    text: 'Productivity Data'
+                },
+                    chart: {
+                        type: 'bar'
+                    }
+                ,
+                xAxis: {
+                    categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+                },
+
+                series: [{
+                    data: [500, 400, 350, 375, 425, 450, 320, 550, 235, 310, 330, 350]
+                }]
+            };
+
+
+
+        // Sample options for Line chart
+        $scope.chartOptions = {
+            title: {
+                text: 'Productivity Data'
+            },
+            xAxis: {
+                categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+            },
+
+            series: [{
+                data: [500, 400, 350, 375, 425, 450, 320, 550, 235, 310, 330, 350]
+            }]
+        };
+
+        // Sample data for pie chart
+        $scope.pieData = [{
+            name: "Infosys",
+            y: 36.33
+        }, {
+            name: "CTS",
+            y: 40.03,
+            sliced: true,
+            selected: true
+        }, {
+            name: "Wipro",
+            y: 46.38,
+            sliced: true,
+            selected: true
+        }, {
+            name: "TCS",
+            y: 55.77
+        }, {
+            name: "CSC",
+            y: 40.91
+        }, {
+            name: "XYZ",
+            y: 20.0
+        }]
+    });
+</script>
+</body>
+</html>

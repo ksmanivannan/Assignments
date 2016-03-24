@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title> Chart Drawing </title>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular.min.js"></script>
+<script type="text/javascript" src="https://code.highcharts.com/highcharts.js"></script>
+<script src="http://code.highcharts.com/adapters/standalone-framework.js"></script>
+<script src="highcharts-ng-master/highcharts-ng-master/src/highcharts-ng.js"></script>
+    <link href="bootstrap.css" rel="stylesheet" />
+    <link href="bootstrap-theme.css" rel="stylesheet" />
+
+</head>
+<body ng-controller="chartcontroller">
+
+<div ng-app="mychartapp">
+    <div ng-controller="chartcontroller">
+        <div class="span12">
+            <input type="text" ng-model="barValue1" placeholder="Datapoint-1">
+            <input type="text" ng-model="barValue2" placeholder="Datapoint-2">
+            <input type="text" ng-model="barValue3" placeholder="Datapoint-3">
+            <input type="text" ng-model="barValue4" placeholder="Datapoint-4">
+            <input type="text" ng-model="barValue5" placeholder="Datapoint-5">
+            <button ng-click="update()">click to update chart</button>
+            <div class="row">
+                <highchart id="chart1" config="chartConfig" class="span10"></highchart>
+            </div>
+
+
+<script>
+
+    //See: https://github.com/pablojim/highcharts-ng
+    var mychartapp = angular.module('mychartapp', ["highcharts-ng"]);
+
+    mychartapp.factory('Chart', function () {
+        var chartConfig = {
+            options: {
+                chart: {
+                    type: 'bar'
+                }
+            },
+            series: [{
+                data: [10, 15, 12, 8, 7]
+            }],
+            xAxis: [{
+                categories: ['Jan', 'Feb ','Mar ','Apr ','May ']
+            }],
+            title: {
+                text: 'Hello'
+            },
+
+            loading: false
+        }
+        return chartConfig;
+    });
+
+
+    mychartapp.controller('chartcontroller', function ($scope, Chart) {
+        $scope.chartConfig = Chart;
+
+
+        $scope.update = function () {
+            $scope.chartConfig.title.text = "Monthly Sales Data"; //Works
+            $scope.chartConfig.series = [{ //Works
+                "name": "Updated data",
+                "data": [+$scope.barValue1, +$scope.barValue2, +$scope.barValue3, +$scope.barValue4, +$scope.barValue5]
+            }];
+
+            console.log($scope.chartConfig);
+        }
+
+    });
+</script>
+</body>
+</html>
