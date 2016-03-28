@@ -1,0 +1,70 @@
+﻿<!DOCTYPE html>
+<html ng-app="spreadsheetApp">
+<head>
+    <title>SpreadSheet View</title>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular.min.js"></script>
+    <link href="bootstrap.css" rel="stylesheet" />
+    <link href="bootstrap-theme.css" rel="stylesheet" />
+    <script src="https://docs.handsontable.com/0.24.1/bower_components/handsontable/dist/handsontable.full.js"></script>
+    <link type="text/css" rel="stylesheet" href="https://docs.handsontable.com/0.24.1/bower_components/handsontable/dist/handsontable.full.min.css">
+
+    <script>
+        angular.module("spreadsheetApp", [])
+
+        .controller("defaultCtrl", function ($scope) {
+            $scope.loadData = function () {
+
+                var nestedObjects = [
+                            {id: 1, name: {first: "Mani", last: "Shan"}, designation: "Lead"},
+                            {id: 2, designation: ""}, 
+                            {id: 3, name: {first: "John", last: "Peter"}, designation: "Manager"}
+                        ],
+                        contr = document.getElementById('tableTemplate'),tableLoader;
+
+                tableLoader = new Handsontable(contr, {
+                    data: nestedObjects,
+                    colHeaders: true,
+                    columns: [
+                        {data: 'id'},
+                        {data: 'name.first'},
+                        {data: 'name.last'},
+                        {data: 'address'}
+                    ],
+                    minSpareRows: 1
+                });
+
+                function bindButton() {
+                    if (typeof Handsontable === "undefined") {
+                        return;
+                    }
+
+                    Handsontable.Dom.addEvent(document.body, 'click', function (e) {
+
+                        var element = e.target || e.srcElement;
+
+                        if (element.nodeName == "BUTTON" && element.name == 'dump') {
+                            var name = element.getAttribute('data-dump');
+                            var instance = element.getAttribute('data-instance');
+                            var hdsontbl = window[instance];
+                            console.log('data of ' + name, hdsontbl.getData());
+                        }
+                    });
+                }
+                bindButton();
+
+            }
+        });
+    </script>
+</head>
+<body ng-controller="defaultCtrl">
+<p>
+    <button class="btn btn-primary"
+            ng-click="loadData()">
+        Load Data
+    </button>
+</p>
+    <div id="tableTemplate" class="hdsontbl handsontable htColumnHeaders">
+
+    </div>
+</body>
+</html>
