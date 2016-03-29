@@ -36,7 +36,7 @@
                             {data: 'id'},
                             {data: 'name.first'},
                             {data: 'name.last'},
-                            {data: 'address'}
+                            {data: 'designation'}
                         ],
                         minSpareRows: 1
                     });
@@ -61,11 +61,12 @@
         app.controller("defaultCtrl", function ($scope) {
 
             $scope.nestedObjects = [
+                {id: "id", name: {first: "first", last: "last"}, designation: "designation"},
                 {id: 1, name: {first: "Mani", last: "Shan"}, designation: "Lead"},
                 {id: 2, designation: ""},
                 {id: 3, name: {first: "John", last: "Peter"}, designation: "Manager"}
             ];
-           
+
         });
     </script>
 
