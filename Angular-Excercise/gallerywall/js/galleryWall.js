@@ -1,6 +1,6 @@
-var galleryWall = angular.module('galleryWall', []);
+var galleryApp = angular.module('galleryApp', []);
 
-galleryWall.directive("galleryWall", function(){
+galleryApp.directive("galleryWall", function(){
   var template = '<div class="photos">'+
                    '<img win-fn-enter win-hide-err ng-repeat="item in galleryItems" class="photoImg" ng-src="{{item.medium_url}}" />'+
                  '</div>';
@@ -26,7 +26,7 @@ galleryWall.directive("galleryWall", function(){
   };
 });
 
-galleryWall.directive("winHideErr", function() {
+galleryApp.directive("winHideErr", function() {
   return {
     restrict: 'A',
     link: function(scope, element, attrs) {
@@ -36,7 +36,7 @@ galleryWall.directive("winHideErr", function() {
     }
   };
 });
-galleryWall.directive("winFnEnter", function(){
+galleryApp.directive("winFnEnter", function(){
   var isScrolledIntoView = function(el){
     var docViewTop = $(window).scrollTop();
     var docViewBottom = docViewTop + $(window).height();
