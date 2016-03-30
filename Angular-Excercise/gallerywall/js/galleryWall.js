@@ -2,13 +2,13 @@ var galleryApp = angular.module('galleryApp', []);
 
 galleryApp.directive("galleryWall", function(){
   var template = '<div class="photos">'+
-                   '<img win-fn-enter win-hide-err ng-repeat="item in galleryItems" class="photoImg" ng-src="{{item.medium_url}}" />'+
+                   '<img win-fn-enter win-hide-err ng-repeat="item in galleryItems track by $index" class="photoImg" ng-src="{{item.medium_url}}" />'+
                  '</div>';
   return {
     restrict: 'E',
     template: template,
     scope: {
-        photoDataStr: '@galleryData',
+        photoDataStr: '@galleryData'
     },  
     controller:function($scope){
       $scope.galleryData = eval($scope.photoDataStr);
@@ -17,12 +17,14 @@ galleryApp.directive("galleryWall", function(){
       $(window).scroll(function(){
         var topHeight = $("body").height() - window.innerHeight;
         if(topHeight - $(window).scrollTop() < 1000){
+			console.log("Scrolling down...");
           var len = $scope.galleryItems.length;
-		  $scope.galleryItems = $scope.galleryItems.concat($scope.galleryData.slice(len, len+15));
-          $scope.$apply();
+		  //$scope.galleryItems = $scope.galleryItems.slice(16, len);
+		  $scope.galleryItems = $scope.galleryItems.concat($scope.galleryData.slice(len, len+15))
+		  $scope.$apply();
         }
       }.bind(this));
-    },
+    }
   };
 });
 
