@@ -1,0 +1,43 @@
+<html ng-app="myApp">
+  <script type="text/javascript" src="images.js"></script>
+<head>
+
+<style>
+body{
+  /*background-color: blue;*/
+}
+.photos{
+    width: 1212px;
+    margin: auto;
+}
+.photoImg{
+  display: inline-block;
+  width:200px;
+  height:200px;
+  padding: 1px;
+  margin: auto;
+}
+.outer { position: relative; left: 50%; float: left; }
+.inner { position: relative; left: -50%; float: left; }
+
+</style>
+
+
+  <script type="text/javascript" src="https://github.com/greensock/GreenSock-JS/tree/master/src/minified/TweenMax.min.js"></script>
+  <script type="text/javascript" src="http://code.jquery.com/jquery-2.2.2.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.5/angular.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.5/angular-route.min.js"></script>
+  <script type="text/javascript" src="js/galleryWall.js"></script>
+  <script type="text/javascript" src="js/application.js"></script>
+
+  <link rel="stylesheet" type="text/css" href="stylesheets/main.css">
+
+  </head>
+<body>
+  <div id="header_region"></div>
+  <div id="main_region">
+    <gallery-wall gallery-data="images.data"></gallery-wall>
+  </div>
+  <div id="footer_region"></div>
+</body>
+</html>
