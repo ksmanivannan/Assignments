@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html ng-app="spoilerTagImpl">
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Directives..</title>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular.min.js"></script>
+
+    <style>
+        div{
+            display:inline-block;
+            vertical-align:top;
+            color: #761c19;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<script>
+angular.module('spoilerTagImpl', [])
+.controller('Controller', ['$scope', '$timeout', function($scope, $timeout) {
+            $scope.name = 'SpoilerTags';
+            $scope.message1 = '';
+            $scope.message2 = '';
+            $scope.hideDialog = function (message1) {
+                $scope.message1 = message1;
+                $scope.isHiddenDialog = true;
+                $timeout(function () {
+                    $scope.message1 = '';
+                    $scope.isHiddenDialog = false;
+                }, 2000);
+            };
+            $scope.replaceDialog = function (message2) {
+                $scope.message2 = message2;
+                $scope.isReplaceDialog = true;
+                $scope.message2 = message2;
+
+
+
+            };
+
+        }])
+.directive('myDialog', function() {
+return {
+    restrict: 'E',
+    transclude: true,
+    scope: {
+        'close': '&onClose'
+
+    },
+    templateUrl: '/Assignment/SpoilerCreator/myDialogueClose.html'
+}
+        }).directive('myReplaceDialog', function() {
+                    return {
+                        restrict: 'E',
+                        transclude: true,
+                        scope: {
+                            'replace' : '&onReplace'
+                        },
+                        templateUrl: '/Assignment/SpoilerCreator/myDialogueReplace.html'
+                    };
+                });
+</script>
+
+
+<div ng-controller="Controller">
+
+    <p>Here is the Content We require..The Spoiler tag works with hidden elements. Wheneve we access/click the hidden element it shows the
+    sctual content that is hiding behind the spoiler tag as like the following tag for Version1 and a specific content will be
+    replaced and inaccessible like version2:</P>
+    <b>Version1:</b>
+    {{message1}}
+    <my-dialog ng-hide="isHiddenDialog" on-close="hideDialog(message1)">
+    </my-dialog><br>
+    <br>
+    <b>Version2:</b>
+    <my-replace-dialog ng-hide="isReplaceDialog" on-replace="replaceDialog(message2)">
+    </my-replace-dialog><br>
+    {{message2}}
+
+    <br><br><br>Custom Directives for Spoiler/Redaction.., {{name}}!
+</div>
+
+
+
+</body>
+</html>
