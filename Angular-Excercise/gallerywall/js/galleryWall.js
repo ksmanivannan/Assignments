@@ -13,17 +13,51 @@ galleryApp.directive("galleryWall", function(){
     controller:function($scope){
       $scope.galleryData = eval($scope.photoDataStr);
       $scope.galleryItems = $scope.galleryData.slice(0,60);
+      var lastScrollTop = 0;
 
-      $(window).scroll(function(){
+      $(window).scroll(function() {
         var topHeight = $("body").height() - window.innerHeight;
-        if(topHeight - $(window).scrollTop() < 1000){
-			console.log("Scrolling down...");
+        var st = $(window).scrollTop();
+        if (topHeight - $(window).scrollTop() < 1000) {
           var len = $scope.galleryItems.length;
-		  //$scope.galleryItems = $scope.galleryItems.slice(16, len);
-		  $scope.galleryItems = $scope.galleryItems.concat($scope.galleryData.slice(len, len+15))
-		  $scope.$apply();
+          var galleryDataLength=60;
+
+          if (st > lastScrollTop) {
+            console.log("downscroll..." + st);
+            if ($scope.galleryItems.length > 300) {
+              //For downscroll
+              $scope.galleryItems = $scope.galleryItems.slice(len - 100, len);
+
+            }
+
+            $scope.galleryItems = $scope.galleryItems.concat($scope.galleryData.slice(galleryDataLength, galleryDataLength + 30))
+            galleryDataLength=galleryDataLength+30;
+          }
+
+          else {
+            //For upscroll code
+            console.log("upscroll..." + st);
+            if ($scope.galleryItems.length > 200) {
+              //For downscroll
+              $scope.galleryItems = $scope.galleryItems.slice(0, len-30);
+
+            }
+
+            if(galleryDataLength- len - 50 > 0)
+            {
+            $scope.galleryItems = $scope.galleryData.slice(galleryDataLength - len - 50, galleryDataLength - len).concat($scope.galleryItems);
+            galleryDataLength=galleryDataLength-50;
+            }else{
+              $scope.galleryItems = $scope.galleryData.slice(0, galleryDataLength).concat($scope.galleryItems);
+            }
+          }
+
+          $scope.$apply();
+
         }
+            lastScrollTop = st;
       }.bind(this));
+
     }
   };
 });
