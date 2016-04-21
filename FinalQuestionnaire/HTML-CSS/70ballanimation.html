@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+<style>
+
+    .circle {
+        border-radius: 100px;
+        height: 200px;
+        width: 200px;
+
+    }
+    .container:hover  {
+        transform: translateX(400px);
+    }
+
+    .container {
+        display:-webkit-box;
+        -webkit-box-pack:center;
+        -webkit-box-align:center;
+        display:-moz-box;
+        -moz-box-pack:center;
+        -moz-box-align:center;
+    }
+
+    .circle {
+    @extend .circle;
+        background: green;
+        transition: all 20s ease-in-out;
+    }
+
+
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+    <div class="circle"></div>
+
+</div>
+
+
+</body>
+</html>
