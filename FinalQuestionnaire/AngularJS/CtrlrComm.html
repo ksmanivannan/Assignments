@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title> Controller Communication </title>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular.min.js"></script>
+    <script type="text/javascript" src="https://code.angularjs.org/angular-1.0.0rc9.js"></script>
+</head>
+
+
+
+<body ng-app="module1">
+
+<div ng-controller="Controller1">
+    Controller1:<input type="text" ng-model="data"/>
+    <button ng-click="transferMessage(data);">Communicate</button>
+    <p ng-bind="data"></p>
+
+
+</div>
+<div ng-controller="Controller2">
+    Controller2:<p ng-bind="data"></p>
+
+</div>
+
+<script>
+
+    var myModule = angular.module('module1', []);
+    myModule.factory('mySharedService', function($rootScope) {
+        var sharedService = {};
+
+        sharedService.data = '';
+
+        sharedService.prepForBroadcast = function(msg) {
+            this.data = msg;
+            this.broadcastItem();
+        };
+
+        sharedService.broadcastItem = function() {
+            $rootScope.$broadcast('handleBroadcast');
+        };
+
+        return sharedService;
+    });
+
+    function Controller1($scope, sharedService) {
+        $scope.transferMessage = function(msg) {
+            sharedService.prepForBroadcast(msg);
+        };
+
+        $scope.$on('handleBroadcast', function() {
+            $scope.data = sharedService.data;
+        });
+    }
+
+    function Controller2($scope, sharedService) {
+        $scope.$on('handleBroadcast', function() {
+            $scope.data = 'Receiver: ' + sharedService.data;
+        });
+    }
+
+
+
+    Controller1.$inject = ['$scope', 'mySharedService'];
+
+    Controller2.$inject = ['$scope', 'mySharedService'];
+
+
+
+</script>
+
+</body>
+
+
+
+
+
+</html>
